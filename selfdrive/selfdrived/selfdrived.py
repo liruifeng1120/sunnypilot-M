@@ -31,7 +31,7 @@ REPLAY = "REPLAY" in os.environ
 SIMULATION = "SIMULATION" in os.environ
 TESTING_CLOSET = "TESTING_CLOSET" in os.environ
 LONGITUDINAL_PERSONALITY_MAP = {v: k for k, v in log.LongitudinalPersonality.schema.enumerants.items()}
-NO_DM = os.getenv("NO_DM") is not None
+# NO_DM = os.getenv("NO_DM") is not None
 
 ThermalStatus = log.DeviceState.ThermalStatus
 State = log.SelfdriveState.OpenpilotState
@@ -75,15 +75,15 @@ class SelfdriveD(CruiseHelper):
     self.gps_packets = [self.gps_location_service]
     self.sensor_packets = []
     self.camera_packets = ["roadCameraState"]
-    if not NO_DM:
-      self.camera_packets.append("driverCameraState")
+    # if not NO_DM:
+      # self.camera_packets.append("driverCameraState")
 
     # TODO: de-couple selfdrived with card/conflate on carState without introducing controls mismatches
     self.car_state_sock = messaging.sub_sock('carState', timeout=20)
 
-    ignore = self.sensor_packets + self.gps_packets + ['alertDebug', "accelerometer", "gyroscope"]
-    if NO_DM:
-      ignore += ['driverMonitoringState']
+    ignore = self.sensor_packets + self.gps_packets + ['alertDebug', "accelerometer", "gyroscope", "driverMonitoringState"]
+    # if NO_DM:
+      # ignore += ['driverMonitoringState']
     if SIMULATION:
       ignore += ['driverCameraState', 'managerState']
     if REPLAY:
@@ -198,7 +198,7 @@ class SelfdriveD(CruiseHelper):
     if not self.CP.pcmCruise and CS.vCruise > 250 and resume_pressed:
       self.events.add(EventName.resumeBlocked)
 
-    if not self.CP.notCar and not NO_DM:
+    if not self.CP.notCar:
       self.events.add_from_msg(self.sm['driverMonitoringState'].events)
 
     # Add car events, ignore if CAN isn't valid
