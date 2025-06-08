@@ -8,12 +8,12 @@ from openpilot.common.pid import PIDController
 class LatControlPID(LatControl):
   def __init__(self, CP, CP_SP, CI):
     super().__init__(CP, CP_SP, CI)
-    
+
     # ====== 新增补偿参数 ======
     # 建议调整范围：±0.1~0.5（首次调试建议按注释值）
-    kpV_comp = [-0.1, -0.1, -0.3, -0.5]  # 比例增益补偿（按车速段分段补偿，最后两位对应高速段）
-    kiV_comp = [-0.01, -0.02, -0.02, -0.03]  # 积分增益补偿（抑制低速震荡）
-    kf_comp = -0.1  # 前馈增益补偿（减少高速过冲）
+    kpV_comp = [-0.0, -0.0, -0.0, -0.0]  # 比例增益补偿（按车速段分段补偿，最后两位对应高速段）
+    kiV_comp = [-0.00, -0.00, -0.00, -0.00]  # 积分增益补偿（抑制低速震荡）
+    kf_comp = -0.0  # 前馈增益补偿（减少高速过冲）
 
     # ====== 应用补偿 ======
     new_kpV = [x + y for x, y in zip(CP.lateralTuning.pid.kpV, kpV_comp)]
