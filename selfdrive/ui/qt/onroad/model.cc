@@ -113,12 +113,32 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
   // 获取当前时间（秒），用于动态色带流动
   double t = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
 
+  // ========== 关键修改：流动速度随车速变化 ==========
+  float vEgo = 0.0f;
+  auto *s = uiState();
+  if (s->sm->updated("carState")) {
+    vEgo = (*s->sm)["carState"].getCarState().getVEgo(); // 单位 m/s
+  }
+  float speed_coef = 0.18f; // 默认基础速度，想让某一阶段更“慢”——减小对应 speed_coef 的数值（如 0.18 → 0.12），想让某一阶段更“快”——增大对应 speed_coef 的数值（如 0.25 → 0.35）
+  float vEgo_kmh = vEgo * 3.6f; // 转换为 km/h
+
+  if (vEgo_kmh <= 40) {
+    speed_coef = 0.11f; // 低速
+  } else if (vEgo_kmh <= 80) {
+    speed_coef = 0.14f; // 中低速
+  } else if (vEgo_kmh <= 120) {
+    speed_coef = 0.16f; // 中高速
+  } else {
+    speed_coef = 0.17f; // 高速
+  }
+  // ==================================================
+
   // 彩虹分段数，越大越丝滑
   const int steps = 24;
   for (int i = 0; i <= steps; ++i) {
     float pos = float(i) / steps;
-    // hue随时间流动，0~1
-    float hue = fmod(pos + t * 0.18, 1.0); // 0.18调节流动速度
+    // hue随时间和车速流动
+    float hue = fmod(pos + t * speed_coef, 1.0f);
     QColor color = QColor::fromHslF(hue, 1.0, 0.5, 0.78); // 0.78透明度可调
     bg.setColorAt(pos, color);
   }
