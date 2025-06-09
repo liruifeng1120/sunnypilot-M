@@ -125,11 +125,11 @@ void ModelRenderer::drawPath(QPainter &painter, const cereal::ModelDataV2::Reade
   if (vEgo_kmh <= 40) {
     speed_coef = 0.15f; // 低速
   } else if (vEgo_kmh <= 80) {
-    speed_coef = 0.19f; // 中低速
+    speed_coef = 0.23f; // 中低速
   } else if (vEgo_kmh <= 120) {
-    speed_coef = 0.23f; // 中高速
+    speed_coef = 0.31f; // 中高速
   } else {
-    speed_coef = 0.28f; // 高速
+    speed_coef = 0.36f; // 高速
   }
   // ==================================================
 
